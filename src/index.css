@@ -1,0 +1,387 @@
+:root {
+  --ios-blue: #007aff;
+  --ios-bg: #f2f2f7;
+  --ios-surface: rgba(255, 255, 255, 0.85);
+  --ios-border: rgba(0, 0, 0, 0.08);
+  --text-main: #1c1c1e;
+  --text-muted: #3c3c43;
+  --text-dim: #8e8e93;
+  --accent-gradient: linear-gradient(135deg, #007aff 0%, #0a84ff 100%);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+  color: var(--text-main);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background: #ffffff;
+  background: linear-gradient(180deg, #f0f4ff 0%, #ffffff 30%, #f9f9ff 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Correct Alignment Containers */
+.container {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+.header {
+  padding: 3.5rem 1.25rem 1.75rem;
+  text-align: left;
+}
+
+.logo {
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  margin-bottom: 0.1rem;
+  background: linear-gradient(to right, #1c1c1e, #007aff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* Refined Search Bar */
+.search-card {
+  margin-bottom: 2rem;
+}
+
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: rgba(118, 118, 128, 0.1);
+  border-radius: 12px;
+  height: 48px;
+  padding: 0 0.75rem;
+}
+
+.search-icon-svg {
+  position: absolute;
+  left: 1rem;
+  width: 1.15rem;
+  height: 1.15rem;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  font-size: 1.05rem;
+  padding-left: 2.2rem;
+  padding-right: 0.5rem;
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: var(--text-dim);
+}
+
+/* Perfectly Aligned Results List */
+.results-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.result-item {
+  background: var(--ios-surface);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border-radius: 18px;
+  padding: 1.5rem;
+  border: 1px solid var(--ios-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.mobile-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.label-ios {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ios-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.value-ios {
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.copy-btn {
+  background: var(--accent-gradient);
+  color: white!important;
+  border: none;
+  padding: 0.55rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2);
+  transition: transform 0.1s;
+}
+
+.copy-btn:active {
+  transform: scale(0.95);
+}
+
+.copy-btn span, .copy-btn svg {
+  color: white!important;
+}
+
+/* Aligned Detail Grid */
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--ios-border);
+}
+
+.detail-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.label-small {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.value-small {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-main);
+  font-family: inherit;
+  word-break: break-all;
+}
+
+/* Refined Native Tab Bar */
+.footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 84px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(25px) saturate(160%);
+  -webkit-backdrop-filter: blur(25px) saturate(160%);
+  border-top: 0.5px solid rgba(0, 0, 0, 0.15);
+  display: flex;
+  justify-content: space-around;
+  padding-top: 8px;
+  padding-bottom: env(safe-area-inset-bottom, 24px);
+  z-index: 1000;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: none;
+  border: none;
+  gap: 2px;
+  min-width: 65px;
+  height: 48px;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.2s;
+}
+
+.nav-item:active {
+  opacity: 0.6;
+}
+
+.nav-item svg {
+  width: 1.55rem;
+  height: 1.55rem;
+  color: var(--text-dim);
+  stroke-width: 2.2;
+}
+
+.nav-item span {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  letter-spacing: 0.01em;
+}
+
+.nav-item.active svg {
+  color: var(--ios-blue);
+}
+
+.nav-item.active span {
+  color: var(--ios-blue);
+}
+
+.disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* App Padding to avoid footing overlap */
+.app-wrapper {
+  padding-bottom: 110px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade {
+  animation: fadeIn 0.35s cubic-bezier(0.1, 0, 0.1, 1);
+}
+
+/* Wialon Device Integration Styles */
+.login-card {
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+.ios-input {
+  width: 100%;
+  padding: 1rem;
+  background: rgba(118, 118, 128, 0.1);
+  border: 1px solid var(--ios-border);
+  border-radius: 12px;
+  font-size: 1rem;
+  color: var(--text-main);
+  outline: none;
+}
+.ios-primary-btn {
+  width: 100%;
+  padding: 1rem;
+  background: var(--ios-blue);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.ios-primary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.text-btn {
+  background: none;
+  border: none;
+  color: var(--ios-blue);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.status-badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(0,0,0,0.05);
+  color: var(--text-muted);
+}
+.status-badge.active {
+  background: rgba(52, 199, 89, 0.2);
+  color: #34c759;
+}
+.error-text {
+  color: #ff3b30;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(0, 122, 255, 0.1);
+  border-top: 3px solid var(--ios-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+.wialon-logo-container {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Navigation Action Button */
+.navigate-btn {
+  background: var(--ios-blue);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.3);
+  cursor: pointer;
+}
+
+.navigate-btn:active {
+  transform: scale(0.92);
+  box-shadow: 0 2px 6px rgba(0, 122, 255, 0.2);
+}
+
+.navigate-btn:disabled {
+  background: #d1d1d6;
+  box-shadow: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
