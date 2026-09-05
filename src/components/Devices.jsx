@@ -31,6 +31,9 @@ const Devices = () => {
   const [error, setError] = useState(null);
   const [sid, setSid] = useState(localStorage.getItem('wialon_sid') || null);
 
+  const [usersMap, setUsersMap] = useState({});
+  const [accountsMap, setAccountsMap] = useState({});
+
   const mappedDevices = useMemo(() => {
     return devices.map(item => {
         const raw = item; // Using direct JSON result
@@ -38,6 +41,7 @@ const Devices = () => {
         const pNode = lmsg.p || {};
         const pflds = raw.pflds || {};
         const flds = raw.flds || {};
+        const aflds = raw.aflds || {};
         const pos = raw.pos || {};
         
         const name = raw.nm || 'Unknown';
@@ -58,6 +62,25 @@ const Devices = () => {
         const model = Object.values(pflds).find(f => f.n?.toLowerCase() === 'model')?.v || '';
         const hwType = Object.values(pflds).find(f => f.n?.toLowerCase() === 'device_type')?.v || '';
         const vin = Object.values(pflds).find(f => f.n?.toLowerCase() === 'vin')?.v || '';
+
+        // Resolve Creator Name
+        const allCustomFields = [...Object.values(flds), ...Object.values(pflds), ...Object.values(aflds)];
+        const creatorFromField = allCustomFields.find(f => f.n?.toLowerCase() === 'creator' || f.n?.toLowerCase() === 'creator name')?.v;
+        const creator = raw.rel_user_creator_name || 
+                        raw.creator_name || 
+                        raw.creator || 
+                        (raw.crt && usersMap[raw.crt]) || 
+                        creatorFromField || 
+                        (raw.crt ? `User #${raw.crt}` : 'N/A');
+
+        // Resolve Account Name
+        const accountFromField = allCustomFields.find(f => f.n?.toLowerCase() === 'account' || f.n?.toLowerCase() === 'account name')?.v;
+        const account = raw.rel_billing_account_name || 
+                        raw.account_name || 
+                        raw.account || 
+                        (raw.bact && accountsMap[raw.bact]) || 
+                        accountFromField || 
+                        (raw.bact ? `Account #${raw.bact}` : 'N/A');
 
         const lastMsgTime = msgT 
             ? new Date(msgT * 1000).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })
@@ -81,6 +104,8 @@ const Devices = () => {
             model, 
             hwType,
             vin,
+            creator,
+            account,
             isOnline, 
             lastMsg: lastMsgTime, 
             lat, 
@@ -91,15 +116,18 @@ const Devices = () => {
             customFields
         };
     });
-  }, [devices]);
+  }, [devices, usersMap, accountsMap]);
 
   const filteredDevices = useMemo(() => {
     if (searchTerm.length < 2) return [];
+    const term = searchTerm.toLowerCase();
     return mappedDevices.filter(d => 
-        d.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        d.imei.toString().includes(searchTerm) ||
-        d.phone.toString().includes(searchTerm) ||
-        d.vin?.toLowerCase().includes(searchTerm.toLowerCase())
+        d.name.toLowerCase().includes(term) ||
+        d.imei.toString().toLowerCase().includes(term) ||
+        d.phone.toString().toLowerCase().includes(term) ||
+        (d.vin && d.vin.toLowerCase().includes(term)) ||
+        (d.account && d.account.toLowerCase().includes(term)) ||
+        (d.creator && d.creator.toLowerCase().includes(term))
     );
   }, [mappedDevices, searchTerm]);
 
@@ -120,11 +148,48 @@ const Devices = () => {
             to: 0
         };
 
-        const data = await jsonpRequest("core/search_items", params, currentSid);
-        setDevices(data.items || []);
-        setError(null);
+        const [unitRes, usersRes, accountsRes] = await Promise.allSettled([
+            jsonpRequest("core/search_items", params, currentSid),
+            jsonpRequest("core/search_items", {
+                spec: { itemsType: "user", propName: "sys_name", propValueMask: "*", sortType: "sys_name" },
+                force: 1,
+                flags: 1,
+                from: 0,
+                to: 0
+            }, currentSid),
+            jsonpRequest("core/search_items", {
+                spec: { itemsType: "avl_resource", propName: "sys_name", propValueMask: "*", sortType: "sys_name" },
+                force: 1,
+                flags: 1,
+                from: 0,
+                to: 0
+            }, currentSid)
+        ]);
+
+        if (unitRes.status === 'fulfilled') {
+            setDevices(unitRes.value.items || []);
+            setError(null);
+        } else {
+            throw unitRes.reason;
+        }
+
+        if (usersRes.status === 'fulfilled' && usersRes.value?.items) {
+            const uMap = {};
+            usersRes.value.items.forEach(u => {
+                if (u.id && u.nm) uMap[u.id] = u.nm;
+            });
+            setUsersMap(uMap);
+        }
+
+        if (accountsRes.status === 'fulfilled' && accountsRes.value?.items) {
+            const aMap = {};
+            accountsRes.value.items.forEach(a => {
+                if (a.id && a.nm) aMap[a.id] = a.nm;
+            });
+            setAccountsMap(aMap);
+        }
     } catch (err) {
-        if (err.message.includes('Error 1')) {
+        if (err?.message?.includes('Error 1')) {
             setSid(null);
             localStorage.removeItem('wialon_sid');
         }
@@ -140,6 +205,9 @@ const Devices = () => {
         const data = await jsonpRequest("token/login", { token });
         setSid(data.eid);
         localStorage.setItem('wialon_sid', data.eid);
+        if (data.user && data.user.id && data.user.nm) {
+            setUsersMap(prev => ({ ...prev, [data.user.id]: data.user.nm }));
+        }
         fetchDevices(data.eid);
         window.history.replaceState({}, document.title, window.location.origin + window.location.pathname);
     } catch (err) {
@@ -200,7 +268,7 @@ const Devices = () => {
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
                 </div>
-                <input type="text" placeholder="Search Vehicle, IMEI or VIN" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="search-input" />
+                <input type="text" placeholder="Search Vehicle, IMEI, Account or Creator" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="search-input" />
             </div>
           </div>
 
@@ -242,6 +310,14 @@ const Devices = () => {
                     </div>
                     
                     <div className="details-grid" style={{marginBottom: '1rem', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem'}}>
+                      <div className="detail-col">
+                          <span className="label-small">Account</span>
+                          <span className="value-small" style={{fontSize: '0.85rem'}}>{d.account}</span>
+                      </div>
+                      <div className="detail-col">
+                          <span className="label-small">Creator</span>
+                          <span className="value-small" style={{fontSize: '0.85rem'}}>{d.creator}</span>
+                      </div>
                       <div className="detail-col">
                           <span className="label-small">IMEI</span>
                           <span className="value-small" style={{fontSize: '0.85rem'}}>{d.imei}</span>

@@ -81,6 +81,18 @@ const SIMSearch = () => {
                 <span className="label-small">IMSI</span>
                 <span className="value-small">{item.SIM_IMSI || 'N/A'}</span>
               </div>
+              {(item.ACCOUNT || item.account) && (
+                <div className="detail-col">
+                  <span className="label-small">Account</span>
+                  <span className="value-small">{item.ACCOUNT || item.account}</span>
+                </div>
+              )}
+              {(item.CREATOR || item.creator) && (
+                <div className="detail-col">
+                  <span className="label-small">Creator</span>
+                  <span className="value-small">{item.CREATOR || item.creator}</span>
+                </div>
+              )}
             </div>
           </div>
         ))}
